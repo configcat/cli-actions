@@ -7,12 +7,14 @@ const toolName = 'configcat'
 
 async function run(): Promise<void> {
   try {
-    core.startGroup('Checking platform')
+    core.startGroup('Determining executing platform')
     const platform = checkPlatform()
     if (!platform) {
       core.setFailed('Not supported platform.')
       return
     }
+    core.info(`OS: ${platform.id}`)
+    core.info(`Arch: ${platform.arch}`)
     core.endGroup()
 
     core.startGroup('Fetching latest CLI release metadata')
@@ -23,15 +25,20 @@ async function run(): Promise<void> {
     let path = tc.find(toolName, version)
     core.setOutput('cache-hit', !!path)
     if (!path) {
-      core.info('ConfigCat CLI not found in cache, downloading...')
-      core.startGroup('Downloading latest CLI')
+      core.startGroup('ConfigCat CLI not found in cache, downloading')
       const file = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`
-      path = await tc.downloadTool(`https://github.com/configcat/cli/releases/download/v${version}/${file}`)
+      const url = `https://github.com/configcat/cli/releases/download/v${version}/${file}`
+      core.info(
+        `Downloading artifact ${`https://github.com/configcat/cli/releases/download/v${version}/${file}`}`
+      )
+      path = await tc.downloadTool(url)
+      core.info('Extracting...')
       if (platform.ext === 'zip') {
         path = await tc.extractZip(path)
       } else {
         path = await tc.extractTar(path)
       }
+      core.info('Caching downloaded artifact')
       path = await tc.cacheDir(path, toolName, version)
       core.endGroup()
     } else {

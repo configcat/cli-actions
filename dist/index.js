@@ -29840,17 +29840,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getLatestGitHubRelease = getLatestGitHubRelease;
+const core = __importStar(__nccwpck_require__(7484));
 const http = __importStar(__nccwpck_require__(4844));
 function getLatestGitHubRelease() {
     return __awaiter(this, void 0, void 0, function* () {
+        const url = 'https://api.github.com/repos/configcat/cli/releases/latest';
+        core.info(`Fetching metadata from ${url}`);
         const client = new http.HttpClient('configcat/setup-cli');
-        const resp = yield client.get('https://api.github.com/repos/configcat/cli/releases/latest');
+        const resp = yield client.get(url);
         const body = yield resp.readBody();
         const statusCode = resp.message.statusCode || 500;
         if (statusCode >= 400) {
             throw new Error(`Failed to get latest release: status code ${statusCode}: ${body}`);
         }
-        return JSON.parse(body);
+        const parsed = JSON.parse(body);
+        core.info(`ID: ${parsed.id}`);
+        core.info(`Tag: ${parsed.tag_name}`);
+        return parsed;
     });
 }
 
@@ -29913,12 +29919,14 @@ const toolName = 'configcat';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.startGroup('Checking platform');
+            core.startGroup('Determining executing platform');
             const platform = (0, platform_1.checkPlatform)();
             if (!platform) {
                 core.setFailed('Not supported platform.');
                 return;
             }
+            core.info(`OS: ${platform.id}`);
+            core.info(`Arch: ${platform.arch}`);
             core.endGroup();
             core.startGroup('Fetching latest CLI release metadata');
             const latestRelease = yield (0, gh_release_1.getLatestGitHubRelease)();
@@ -29927,16 +29935,19 @@ function run() {
             let path = tc.find(toolName, version);
             core.setOutput('cache-hit', !!path);
             if (!path) {
-                core.info('ConfigCat CLI not found in cache, downloading...');
-                core.startGroup('Downloading latest CLI');
+                core.startGroup('ConfigCat CLI not found in cache, downloading');
                 const file = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`;
-                path = yield tc.downloadTool(`https://github.com/configcat/cli/releases/download/v${version}/${file}`);
+                const url = `https://github.com/configcat/cli/releases/download/v${version}/${file}`;
+                core.info(`Downloading artifact ${`https://github.com/configcat/cli/releases/download/v${version}/${file}`}`);
+                path = yield tc.downloadTool(url);
+                core.info('Extracting...');
                 if (platform.ext === 'zip') {
                     path = yield tc.extractZip(path);
                 }
                 else {
                     path = yield tc.extractTar(path);
                 }
+                core.info('Caching downloaded artifact');
                 path = yield tc.cacheDir(path, toolName, version);
                 core.endGroup();
             }
