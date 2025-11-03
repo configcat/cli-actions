@@ -27,10 +27,10 @@ const supportedPlatforms = new Map<string, SupportedPlatform>([
 export function checkPlatform(): Platform | null {
   const plat = supportedPlatforms.get(process.platform)
   if (!plat) return null
-  if (plat.archs.includes(process.arch))
+  if (plat.archs.includes(archs[process.arch]))
     return {
       id: plat.id,
-      arch: plat.archs[process.arch],
+      arch: archs[process.arch],
       ext: process.platform === 'win32' ? 'zip' : 'tar.gz'
     }
   return null
