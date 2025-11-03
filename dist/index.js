@@ -29993,10 +29993,10 @@ function checkPlatform() {
     const plat = supportedPlatforms.get(node_process_1.default.platform);
     if (!plat)
         return null;
-    if (plat.archs.includes(node_process_1.default.arch))
+    if (plat.archs.includes(archs[node_process_1.default.arch]))
         return {
             id: plat.id,
-            arch: plat.archs[node_process_1.default.arch],
+            arch: archs[node_process_1.default.arch],
             ext: node_process_1.default.platform === 'win32' ? 'zip' : 'tar.gz'
         };
     return null;
