@@ -29970,12 +29970,12 @@ const archs = {
     x64: 'x64',
     ia32: 'x86',
     arm: 'arm',
-    arm64: 'arm64'
+    arm64: 'arm64',
 };
 const supportedPlatforms = new Map([
     ['linux', { id: 'linux', archs: [archs.arm, archs.arm64, archs.x64] }],
     ['darwin', { id: 'osx', archs: [archs.arm64, archs.x64] }],
-    ['win32', { id: 'win', archs: [archs.arm64, archs.x64, archs.ia32] }]
+    ['win32', { id: 'win', archs: [archs.arm64, archs.x64, archs.ia32] }],
 ]);
 function checkPlatform() {
     const plat = supportedPlatforms.get(node_process_1.default.platform);
@@ -29985,7 +29985,7 @@ function checkPlatform() {
         return {
             id: plat.id,
             arch: archs[node_process_1.default.arch],
-            ext: node_process_1.default.platform === 'win32' ? 'zip' : 'tar.gz'
+            ext: node_process_1.default.platform === 'win32' ? 'zip' : 'tar.gz',
         };
     return null;
 }

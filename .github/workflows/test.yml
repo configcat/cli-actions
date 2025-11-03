@@ -55,4 +55,5 @@ jobs:
         if: steps.setup.outputs.configcat-version == ''
         run: exit 1
       - name: Ensure ConfigCat CLI is installed
-        run: configcat cat
+        run: configcat --version
+        shell: bash
