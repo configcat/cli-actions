@@ -29,8 +29,8 @@ export function checkPlatform(): Platform | null {
   if (!plat) return null
   if (plat.archs.includes(process.arch))
     return {
-      id: process.platform,
-      arch: process.arch,
+      id: plat.id,
+      arch: plat.archs[process.arch],
       ext: process.platform === 'win32' ? 'zip' : 'tar.gz'
     }
   return null

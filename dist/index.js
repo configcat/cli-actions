@@ -29995,8 +29995,8 @@ function checkPlatform() {
         return null;
     if (plat.archs.includes(node_process_1.default.arch))
         return {
-            id: node_process_1.default.platform,
-            arch: node_process_1.default.arch,
+            id: plat.id,
+            arch: plat.archs[node_process_1.default.arch],
             ext: node_process_1.default.platform === 'win32' ? 'zip' : 'tar.gz'
         };
     return null;
