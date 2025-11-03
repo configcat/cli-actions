@@ -13,7 +13,7 @@ interface SupportedPlatform {
 
 const archs = {
   x64: 'x64',
-  x32: 'x86',
+  ia32: 'x86',
   arm: 'arm',
   arm64: 'arm64'
 }
@@ -21,7 +21,7 @@ const archs = {
 const supportedPlatforms = new Map<string, SupportedPlatform>([
   ['linux', {id: 'linux', archs: [archs.arm, archs.arm64, archs.x64]}],
   ['darwin', {id: 'osx', archs: [archs.arm64, archs.x64]}],
-  ['win32', {id: 'win', archs: [archs.arm64, archs.x64, archs.x32]}]
+  ['win32', {id: 'win', archs: [archs.arm64, archs.x64, archs.ia32]}]
 ])
 
 export function checkPlatform(): Platform | null {

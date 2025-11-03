@@ -29791,7 +29791,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 7068:
+/***/ 232:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -29839,24 +29839,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLatestGitHubRelease = getLatestGitHubRelease;
+exports.installAndCacheCLI = installAndCacheCLI;
 const core = __importStar(__nccwpck_require__(7484));
-const http = __importStar(__nccwpck_require__(4844));
-function getLatestGitHubRelease() {
+const tc = __importStar(__nccwpck_require__(3472));
+function installAndCacheCLI(version, toolName, platform) {
     return __awaiter(this, void 0, void 0, function* () {
-        const url = 'https://api.github.com/repos/configcat/cli/releases/latest';
-        core.info(`Fetching metadata from ${url}`);
-        const client = new http.HttpClient('configcat/setup-cli');
-        const resp = yield client.get(url);
-        const body = yield resp.readBody();
-        const statusCode = resp.message.statusCode || 500;
-        if (statusCode >= 400) {
-            throw new Error(`Failed to get latest release: status code ${statusCode}: ${body}`);
+        core.startGroup('ConfigCat CLI not found in cache, downloading');
+        const file = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`;
+        const url = `https://github.com/configcat/cli/releases/download/v${version}/${file}`;
+        core.info(`Downloading artifact ${`https://github.com/configcat/cli/releases/download/v${version}/${file}`}`);
+        let path = yield tc.downloadTool(url);
+        core.info('Extracting...');
+        if (platform.ext === 'zip') {
+            path = yield tc.extractZip(path);
         }
-        const parsed = JSON.parse(body);
-        core.info(`ID: ${parsed.id}`);
-        core.info(`Tag: ${parsed.tag_name}`);
-        return parsed;
+        else {
+            path = yield tc.extractTar(path);
+        }
+        core.info('Caching downloaded artifact...');
+        path = yield tc.cacheDir(path, toolName, version);
+        core.endGroup();
+        return path;
     });
 }
 
@@ -29914,7 +29917,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
 const tc = __importStar(__nccwpck_require__(3472));
 const platform_1 = __nccwpck_require__(3728);
-const gh_release_1 = __nccwpck_require__(7068);
+const version_1 = __nccwpck_require__(311);
+const install_1 = __nccwpck_require__(232);
 const toolName = 'configcat';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -29928,34 +29932,18 @@ function run() {
             core.info(`OS: ${platform.id}`);
             core.info(`Arch: ${platform.arch}`);
             core.endGroup();
-            core.startGroup('Fetching latest CLI release metadata');
-            const latestRelease = yield (0, gh_release_1.getLatestGitHubRelease)();
-            const version = latestRelease.tag_name.slice(1);
-            core.endGroup();
+            const version = yield (0, version_1.getLatestVersion)();
             let path = tc.find(toolName, version);
             core.setOutput('cache-hit', !!path);
             if (!path) {
-                core.startGroup('ConfigCat CLI not found in cache, downloading');
-                const file = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`;
-                const url = `https://github.com/configcat/cli/releases/download/v${version}/${file}`;
-                core.info(`Downloading artifact ${`https://github.com/configcat/cli/releases/download/v${version}/${file}`}`);
-                path = yield tc.downloadTool(url);
-                core.info('Extracting...');
-                if (platform.ext === 'zip') {
-                    path = yield tc.extractZip(path);
-                }
-                else {
-                    path = yield tc.extractTar(path);
-                }
-                core.info('Caching downloaded artifact');
-                path = yield tc.cacheDir(path, toolName, version);
-                core.endGroup();
+                path = yield (0, install_1.installAndCacheCLI)(version, toolName, platform);
             }
             else {
                 core.info('ConfigCat CLI found in cache');
             }
             core.addPath(path);
             core.setOutput('configcat-version', version);
+            core.info(`ConfigCat CLI v${version} installed successfully.`);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -29980,14 +29968,14 @@ exports.checkPlatform = checkPlatform;
 const node_process_1 = __importDefault(__nccwpck_require__(1708));
 const archs = {
     x64: 'x64',
-    x32: 'x86',
+    ia32: 'x86',
     arm: 'arm',
     arm64: 'arm64'
 };
 const supportedPlatforms = new Map([
     ['linux', { id: 'linux', archs: [archs.arm, archs.arm64, archs.x64] }],
     ['darwin', { id: 'osx', archs: [archs.arm64, archs.x64] }],
-    ['win32', { id: 'win', archs: [archs.arm64, archs.x64, archs.x32] }]
+    ['win32', { id: 'win', archs: [archs.arm64, archs.x64, archs.ia32] }]
 ]);
 function checkPlatform() {
     const plat = supportedPlatforms.get(node_process_1.default.platform);
@@ -30000,6 +29988,78 @@ function checkPlatform() {
             ext: node_process_1.default.platform === 'win32' ? 'zip' : 'tar.gz'
         };
     return null;
+}
+
+
+/***/ }),
+
+/***/ 311:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getLatestVersion = getLatestVersion;
+const core = __importStar(__nccwpck_require__(7484));
+const http = __importStar(__nccwpck_require__(4844));
+function getLatestVersion() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Fetching latest CLI version');
+        const url = 'https://raw.githubusercontent.com/configcat/cli/main/.version';
+        core.info(`Fetching metadata from ${url}`);
+        const client = new http.HttpClient('configcat/setup-cli');
+        const resp = yield client.get(url);
+        const body = yield resp.readBody();
+        const statusCode = resp.message.statusCode || 500;
+        if (statusCode >= 400) {
+            throw new Error(`Failed to get latest release: status code ${statusCode}: ${body}`);
+        }
+        core.info(`Version: ${body}`);
+        core.endGroup();
+        return body;
+    });
 }
 
 

@@ -6,8 +6,9 @@ export interface GitHubRelease {
   tag_name: string
 }
 
-export async function getLatestGitHubRelease(): Promise<GitHubRelease> {
-  const url = 'https://api.github.com/repos/configcat/cli/releases/latest'
+export async function getLatestVersion(): Promise<string> {
+  core.startGroup('Fetching latest CLI version')
+  const url = 'https://raw.githubusercontent.com/configcat/cli/main/.version'
   core.info(`Fetching metadata from ${url}`)
   const client: http.HttpClient = new http.HttpClient('configcat/setup-cli')
   const resp: http.HttpClientResponse = await client.get(url)
@@ -16,8 +17,7 @@ export async function getLatestGitHubRelease(): Promise<GitHubRelease> {
   if (statusCode >= 400) {
     throw new Error(`Failed to get latest release: status code ${statusCode}: ${body}`)
   }
-  const parsed = <GitHubRelease>JSON.parse(body)
-  core.info(`ID: ${parsed.id}`)
-  core.info(`Tag: ${parsed.tag_name}`)
-  return parsed
+  core.info(`Version: ${body}`)
+  core.endGroup()
+  return body
 }
