@@ -75,4 +75,4 @@ jobs:
             flag1
             nonexisting
           #user-attributes: id:csp
-      - run: echo '${{join(steps.run_tests.outputs.*, '\n')}}'
+      - run: echo '${{join(steps.eval.outputs.*, '\n')}}'

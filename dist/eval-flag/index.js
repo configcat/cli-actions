@@ -29894,7 +29894,7 @@ function evalFlag() {
             }
             const evalResult = new Map(Object.entries(JSON.parse(lastLine)));
             for (const item of evalResult.entries()) {
-                core.setOutput(item[0], item[1]['value']);
+                core.setOutput(item[0], item[1].value);
             }
             core.endGroup();
         }
