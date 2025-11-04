@@ -70,6 +70,6 @@ jobs:
         with:
           base-url: https://test-cdn-global.configcat.com
           sdk-key: configcat-sdk-1/rvLYCPkdukiOEMFDoGt4xw/0ZW0Uzbafka-zVtQaNQQUw
-          flag-keys: >
+          flag-keys: |
             str_test
             flag1
