@@ -32,7 +32,7 @@ export async function evalFlag(): Promise<void> {
 
   try {
     core.startGroup('Evaluating feature flags with ConfigCat CLI')
-    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map']
+    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json']
     if (userAttributes.length) {
       args.push('-ua', ...userAttributes)
     }
