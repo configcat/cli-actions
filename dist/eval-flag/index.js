@@ -29839,12 +29839,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.evalFlag = evalFlag;
+exports.evalFlags = evalFlags;
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const install_1 = __nccwpck_require__(5255);
 const utils_1 = __nccwpck_require__(330);
-function evalFlag() {
+function evalFlags() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Validating input parameters');
         const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY;
@@ -29903,7 +29903,7 @@ function evalFlag() {
         }
     });
 }
-evalFlag();
+evalFlags();
 
 
 /***/ }),

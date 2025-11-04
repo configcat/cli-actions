@@ -3,7 +3,7 @@ import * as exec from '@actions/exec'
 import {installCLI} from '../install'
 import {lastLineOf} from './utils'
 
-export async function evalFlag(): Promise<void> {
+export async function evalFlags(): Promise<void> {
   core.startGroup('Validating input parameters')
   const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY
   if (!sdkKey) {
@@ -64,4 +64,4 @@ export async function evalFlag(): Promise<void> {
   }
 }
 
-evalFlag()
+evalFlags()
