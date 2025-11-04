@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
-import path from 'path';
+import path from 'path'
 import {Platform} from './platform'
 
 const toolName = 'configcat'
