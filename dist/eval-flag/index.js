@@ -29893,7 +29893,7 @@ function evalFlag() {
                 return;
             }
             const flags = lastLine.split(';');
-            for (const flag in flags) {
+            for (const flag of flags) {
                 const parts = flag.split('=');
                 core.setOutput(parts[0], parts[1]);
             }
