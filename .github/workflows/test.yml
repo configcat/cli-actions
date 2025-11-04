@@ -67,3 +67,9 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./eval-flag
         id: eval
+        with:
+          base-url: https://test-cdn-global.configcat.com
+          sdk-key: configcat-sdk-1/rvLYCPkdukiOEMFDoGt4xw/0ZW0Uzbafka-zVtQaNQQUw
+          flag-keys: >
+            str_test
+            flag1

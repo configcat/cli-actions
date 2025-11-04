@@ -29845,21 +29845,24 @@ const exec = __importStar(__nccwpck_require__(5236));
 const install_1 = __nccwpck_require__(5255);
 function evalFlag() {
     return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Validating input parameters');
+        const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY;
+        if (!sdkKey) {
+            core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.');
+            return;
+        }
+        const flagKeys = core.getMultilineInput('flag-keys');
+        if (!flagKeys.length) {
+            core.setFailed('At least one flag key must be set.');
+            return;
+        }
+        const baseUrl = core.getInput('base-url');
+        const dataGovernance = core.getInput('data-governance');
+        const verbose = core.getBooleanInput('verbose');
+        core.endGroup();
         yield (0, install_1.installCLI)();
         try {
-            const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY;
-            if (!sdkKey) {
-                core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.');
-                return;
-            }
-            const flagKeys = core.getMultilineInput('flag-keys');
-            if (!flagKeys.length) {
-                core.setFailed('At least one flag key must be set.');
-                return;
-            }
-            const baseUrl = core.getInput('base-url');
-            const dataGovernance = core.getInput('data-governance');
-            const verbose = core.getBooleanInput('verbose');
+            core.startGroup('Evaluating feature flags with ConfigCat CLI');
             const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map'];
             if (baseUrl) {
                 args.push('-u', baseUrl);
@@ -29880,6 +29883,7 @@ function evalFlag() {
                 return;
             }
             core.info(result.stdout);
+            core.endGroup();
         }
         catch (error) {
             core.setFailed(error.message);

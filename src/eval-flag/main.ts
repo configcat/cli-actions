@@ -3,22 +3,25 @@ import * as exec from '@actions/exec'
 import {installCLI} from '../install'
 
 export async function evalFlag(): Promise<void> {
+  core.startGroup('Validating input parameters')
+  const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY
+  if (!sdkKey) {
+    core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.')
+    return
+  }
+  const flagKeys = core.getMultilineInput('flag-keys')
+  if (!flagKeys.length) {
+    core.setFailed('At least one flag key must be set.')
+    return
+  }
+  const baseUrl = core.getInput('base-url')
+  const dataGovernance = core.getInput('data-governance')
+  const verbose = core.getBooleanInput('verbose')
+  core.endGroup()
+
   await installCLI()
   try {
-    const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY
-    if (!sdkKey) {
-      core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.')
-      return
-    }
-    const flagKeys = core.getMultilineInput('flag-keys')
-    if (!flagKeys.length) {
-      core.setFailed('At least one flag key must be set.')
-      return
-    }
-    const baseUrl = core.getInput('base-url')
-    const dataGovernance = core.getInput('data-governance')
-    const verbose = core.getBooleanInput('verbose')
-
+    core.startGroup('Evaluating feature flags with ConfigCat CLI')
     const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map']
     if (baseUrl) {
       args.push('-u', baseUrl)
@@ -41,6 +44,7 @@ export async function evalFlag(): Promise<void> {
     }
 
     core.info(result.stdout)
+    core.endGroup()
   } catch (error) {
     core.setFailed((error as Error).message)
   }
