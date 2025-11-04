@@ -29849,12 +29849,12 @@ function evalFlag() {
         try {
             const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY;
             if (!sdkKey) {
-                core.setFailed("Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.");
+                core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.');
                 return;
             }
             const flagKeys = core.getMultilineInput('flag-keys');
             if (!flagKeys.length) {
-                core.setFailed("At least one flag key must be set.");
+                core.setFailed('At least one flag key must be set.');
                 return;
             }
             const baseUrl = core.getInput('base-url');
