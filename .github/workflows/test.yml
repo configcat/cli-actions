@@ -56,4 +56,3 @@ jobs:
         run: exit 1
       - name: Ensure ConfigCat CLI is installed
         run: configcat --version
-        shell: bash
