@@ -75,4 +75,12 @@ jobs:
             flag1
             nonexisting
           #user-attributes: id:csp
-      - run: echo '${{join(steps.eval.outputs.*, '\n')}}'
+      - name: Fail if flag 1 value mismatch
+        if: steps.eval.outputs.str_test != 'nope'
+        run: exit 1
+      - name: Fail if flag 2 value mismatch
+        if: steps.eval.outputs.flag1 != 'false'
+        run: exit 1
+      - name: Fail if flag 3 value mismatch
+        if: steps.eval.outputs.nonexisting != ''
+        run: exit 1
