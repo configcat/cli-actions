@@ -68,18 +68,17 @@ jobs:
       - uses: ./eval-flag
         id: eval
         with:
-          base-url: https://test-cdn-global.configcat.com
-          sdk-key: configcat-sdk-1/rvLYCPkdukiOEMFDoGt4xw/0ZW0Uzbafka-zVtQaNQQUw
+          sdk-key: configcat-sdk-1/PKDVCLf-Hq-h-kCzMp-L7Q/tiOvFw5gkky9LFu1Duuvzw
           flag-keys: |
-            str_test
-            flag1
+            isAwesomeFeatureEnabled
+            isPOCFeatureEnabled
             nonexisting
-          #user-attributes: id:csp
+          user-attributes: email:csp@example.com
       - name: Fail if flag 1 value mismatch
-        if: steps.eval.outputs.str_test != 'nope'
+        if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
       - name: Fail if flag 2 value mismatch
-        if: steps.eval.outputs.flag1 != 'false'
+        if: steps.eval.outputs.flag1 != 'true'
         run: exit 1
       - name: Fail if flag 3 value mismatch
         if: steps.eval.outputs.nonexisting != ''

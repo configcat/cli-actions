@@ -3,10 +3,6 @@ import * as exec from '@actions/exec'
 import {installCLI} from '../install'
 import {lastLineOf} from './utils'
 
-interface EvalResult {
-  value: string
-}
-
 export async function evalFlag(): Promise<void> {
   core.startGroup('Validating input parameters')
   const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY
@@ -29,7 +25,7 @@ export async function evalFlag(): Promise<void> {
 
   try {
     core.startGroup('Evaluating feature flags with ConfigCat CLI')
-    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json']
+    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map']
     if (userAttributes.length) {
       args.push('-ua', ...userAttributes)
     }
@@ -58,9 +54,14 @@ export async function evalFlag(): Promise<void> {
       return
     }
 
-    const evalResult: Map<string, EvalResult> = new Map(Object.entries(JSON.parse(lastLine)))
-    for (const item of evalResult.entries()) {
-      core.setOutput(item[0], item[1].value)
+    const flags = lastLine.split(';')
+    for (const flag in flags) {
+      const parts = flag.split('=')
+      if (parts.length < 2) {
+        core.setOutput(parts[0], '')
+      } else {
+        core.setOutput(parts[0], parts[1])
+      }
     }
 
     core.endGroup()
