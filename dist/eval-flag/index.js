@@ -29896,7 +29896,7 @@ function evalFlag() {
             }
             const evalResult = JSON.parse(lastLine);
             evalResult.forEach((value, key) => {
-                core.setOutput(key, value);
+                core.setOutput(key, value.value);
             });
             core.endGroup();
         }
