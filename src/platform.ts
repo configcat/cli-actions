@@ -1,4 +1,5 @@
 import * as os from 'os'
+import * as core from '@actions/core'
 
 export interface Platform {
   id: string
@@ -24,16 +25,19 @@ const supportedPlatforms = new Map<string, SupportedPlatform>([
   ['win32', {id: 'win', archs: [archs.arm64, archs.x64, archs.ia32]}],
 ])
 
-export function checkPlatform(): Platform | null {
+export function checkPlatform(): Platform {
+  core.startGroup('Determining executing platform')
   const osPlatform = os.platform()
   const asArch = os.arch()
   const platform = supportedPlatforms.get(osPlatform)
-  if (!platform) return null
-  if (platform.archs.includes(archs[asArch]))
-    return {
-      id: platform.id,
-      arch: archs[asArch],
-      ext: osPlatform === 'win32' ? 'zip' : 'tar.gz',
-    }
-  return null
+  if (!platform || !platform.archs.includes(archs[asArch])) throw new Error('Not supported platform.')
+  const result = {
+    id: platform.id,
+    arch: archs[asArch],
+    ext: osPlatform === 'win32' ? 'zip' : 'tar.gz',
+  }
+  core.info(`OS: ${result.id}`)
+  core.info(`Arch: ${result.arch}`)
+  core.endGroup()
+  return result
 }
