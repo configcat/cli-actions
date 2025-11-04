@@ -8,7 +8,7 @@ async function run(): Promise<void> {
     const platform = checkPlatform()
     const version = await getLatestVersion()
     const path = await installCLI(version, platform)
-    core.addPath(path)
+    core.addPath(core.toPlatformPath(path))
     core.setOutput('configcat-version', version)
     core.info(`ConfigCat CLI v${version} installed successfully.`)
   } catch (error) {

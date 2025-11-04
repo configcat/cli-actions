@@ -55,10 +55,5 @@ jobs:
         if: steps.setup.outputs.configcat-version == ''
         run: exit 1
       - name: Ensure ConfigCat CLI is installed
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            configcat.exe --version
-          else
-            configcat --version
-          fi
+        run: configcat --version
         shell: bash

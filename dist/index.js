@@ -29930,7 +29930,7 @@ function run() {
             const platform = (0, platform_1.checkPlatform)();
             const version = yield (0, version_1.getLatestVersion)();
             const path = yield (0, install_1.installCLI)(version, platform);
-            core.addPath(path);
+            core.addPath(core.toPlatformPath(path));
             core.setOutput('configcat-version', version);
             core.info(`ConfigCat CLI v${version} installed successfully.`);
         }
