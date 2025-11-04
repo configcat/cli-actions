@@ -1,4 +1,4 @@
-import process from 'node:process'
+import * as os from 'os'
 
 export interface Platform {
   id: string
@@ -25,13 +25,15 @@ const supportedPlatforms = new Map<string, SupportedPlatform>([
 ])
 
 export function checkPlatform(): Platform | null {
-  const plat = supportedPlatforms.get(process.platform)
-  if (!plat) return null
-  if (plat.archs.includes(archs[process.arch]))
+  const osPlatform = os.platform()
+  const asArch = os.arch()
+  const platform = supportedPlatforms.get(osPlatform)
+  if (!platform) return null
+  if (platform.archs.includes(archs[asArch]))
     return {
-      id: plat.id,
-      arch: archs[process.arch],
-      ext: process.platform === 'win32' ? 'zip' : 'tar.gz',
+      id: platform.id,
+      arch: archs[asArch],
+      ext: osPlatform === 'win32' ? 'zip' : 'tar.gz',
     }
   return null
 }

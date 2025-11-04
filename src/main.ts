@@ -1,10 +1,8 @@
 import * as core from '@actions/core'
-import * as tc from '@actions/tool-cache'
 import {checkPlatform} from './platform'
 import {getLatestVersion} from './version'
-import {installAndCacheCLI} from './install'
-
-const toolName = 'configcat'
+import {installCLI} from './install'
+import {cacheCLI, restoreCLI, toolPath} from './cache'
 
 async function run(): Promise<void> {
   try {
@@ -19,15 +17,18 @@ async function run(): Promise<void> {
     core.endGroup()
 
     const version = await getLatestVersion()
+    const key = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`
 
-    let path = tc.find(toolName, version)
-    core.setOutput('cache-hit', !!path)
-    if (!path) {
-      path = await installAndCacheCLI(version, toolName, platform)
+    const hit = await restoreCLI(key)
+    core.setOutput('cache-hit', !!hit)
+    if (!hit) {
+      await installCLI(version, toolPath, platform)
+      core.info('Caching downloaded artifact...')
+      await cacheCLI(key)
     } else {
       core.info('ConfigCat CLI found in cache')
     }
-    core.addPath(path)
+    core.addPath(toolPath)
     core.setOutput('configcat-version', version)
     core.info(`ConfigCat CLI v${version} installed successfully.`)
   } catch (error) {
