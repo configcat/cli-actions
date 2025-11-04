@@ -61,11 +61,12 @@ export async function evalFlag(): Promise<void> {
       return
     }
 
-    core.info(lastLine)
     const evalResult = <Map<string, EvalResult>>JSON.parse(lastLine)
-    evalResult.forEach((value: EvalResult, key: string) => {
-      core.setOutput(key, value.value)
-    })
+    for (const item of evalResult.entries()) {
+      core.setOutput(item[0], item[1].value)
+    }
+
+    evalResult.forEach((value: EvalResult, key: string) => {})
     core.endGroup()
   } catch (error) {
     core.setFailed((error as Error).message)
