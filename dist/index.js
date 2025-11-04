@@ -29919,8 +29919,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
+const fs_1 = __importDefault(__nccwpck_require__(9896));
 const platform_1 = __nccwpck_require__(3728);
 const version_1 = __nccwpck_require__(311);
 const install_1 = __nccwpck_require__(232);
@@ -29930,6 +29934,10 @@ function run() {
             const platform = (0, platform_1.checkPlatform)();
             const version = yield (0, version_1.getLatestVersion)();
             const path = yield (0, install_1.installCLI)(version, platform);
+            core.info(`${path}`);
+            fs_1.default.readdirSync(path).forEach(file => {
+                core.info(file);
+            });
             core.addPath(core.toPlatformPath(path));
             core.setOutput('configcat-version', version);
             core.info(`ConfigCat CLI v${version} installed successfully.`);
