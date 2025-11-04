@@ -29838,34 +29838,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.installCLI = installCLI;
 const core = __importStar(__nccwpck_require__(7484));
 const tc = __importStar(__nccwpck_require__(3472));
+const path_1 = __importDefault(__nccwpck_require__(6928));
 const toolName = 'configcat';
 function installCLI(version, platform) {
     return __awaiter(this, void 0, void 0, function* () {
-        let path = tc.find(toolName, version);
-        if (!path) {
+        let cliPath = tc.find(toolName, version);
+        if (!cliPath) {
             core.startGroup('ConfigCat CLI not found in tool cache, downloading');
             const file = `configcat-cli_${version}_${platform.id}-${platform.arch}.${platform.ext}`;
             const url = `https://github.com/configcat/cli/releases/download/v${version}/${file}`;
             core.info(`Downloading artifact ${`https://github.com/configcat/cli/releases/download/v${version}/${file}`}`);
-            path = yield tc.downloadTool(url);
+            cliPath = yield tc.downloadTool(url);
             core.info('Extracting...');
             if (platform.ext === 'zip') {
-                path = yield tc.extractZip(path);
+                cliPath = yield tc.extractZip(cliPath);
+                cliPath = path_1.default.join(cliPath, `${platform.id}-${platform.arch}`);
             }
             else {
-                path = yield tc.extractTar(path);
+                cliPath = yield tc.extractTar(cliPath);
             }
-            path = yield tc.cacheDir(path, toolName, version);
+            cliPath = yield tc.cacheDir(cliPath, toolName, version);
             core.endGroup();
         }
         else {
             core.info('ConfigCat CLI found in tool cache');
         }
-        return path;
+        return cliPath;
     });
 }
 
@@ -29919,12 +29924,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
-const fs_1 = __importDefault(__nccwpck_require__(9896));
 const platform_1 = __nccwpck_require__(3728);
 const version_1 = __nccwpck_require__(311);
 const install_1 = __nccwpck_require__(232);
@@ -29934,10 +29935,6 @@ function run() {
             const platform = (0, platform_1.checkPlatform)();
             const version = yield (0, version_1.getLatestVersion)();
             const path = yield (0, install_1.installCLI)(version, platform);
-            core.info(`${path}`);
-            fs_1.default.readdirSync(path).forEach(file => {
-                core.info(file);
-            });
             core.addPath(core.toPlatformPath(path));
             core.setOutput('configcat-version', version);
             core.info(`ConfigCat CLI v${version} installed successfully.`);
