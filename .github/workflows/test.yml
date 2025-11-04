@@ -78,7 +78,7 @@ jobs:
         if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
       - name: Fail if flag 2 value mismatch
-        if: steps.eval.outputs.flag1 != 'true'
+        if: steps.eval.outputs.isPOCFeatureEnabled != 'true'
         run: exit 1
       - name: Fail if flag 3 value mismatch
         if: steps.eval.outputs.nonexisting != ''

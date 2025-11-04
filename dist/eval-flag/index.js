@@ -29864,7 +29864,7 @@ function evalFlag() {
         core.endGroup();
         yield (0, install_1.installCLI)();
         try {
-            core.startGroup('Evaluating feature flags with ConfigCat CLI');
+            core.info('Evaluating feature flags with ConfigCat CLI');
             const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map'];
             if (userAttributes.length) {
                 args.push('-ua', ...userAttributes);
@@ -29895,14 +29895,8 @@ function evalFlag() {
             const flags = lastLine.split(';');
             for (const flag in flags) {
                 const parts = flag.split('=');
-                if (parts.length < 2) {
-                    core.setOutput(parts[0], '');
-                }
-                else {
-                    core.setOutput(parts[0], parts[1]);
-                }
+                core.setOutput(parts[0], parts[1]);
             }
-            core.endGroup();
         }
         catch (error) {
             core.setFailed(error.message);
