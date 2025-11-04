@@ -25,9 +25,7 @@ export async function evalFlag(): Promise<void> {
   const verbose = core.getBooleanInput('verbose')
   core.endGroup()
 
-  core.startGroup('Installing ConfigCat CLI')
   await installCLI()
-  core.endGroup()
 
   try {
     core.startGroup('Evaluating feature flags with ConfigCat CLI')

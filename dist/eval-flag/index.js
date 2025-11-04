@@ -29862,9 +29862,7 @@ function evalFlag() {
         const dataGovernance = core.getInput('data-governance');
         const verbose = core.getBooleanInput('verbose');
         core.endGroup();
-        core.startGroup('Installing ConfigCat CLI');
         yield (0, install_1.installCLI)();
-        core.endGroup();
         try {
             core.startGroup('Evaluating feature flags with ConfigCat CLI');
             const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json'];

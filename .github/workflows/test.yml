@@ -73,5 +73,6 @@ jobs:
           flag-keys: |
             str_test
             flag1
+            nonexisting
           #user-attributes: id:csp
-      - run: echo $GITHUB_OUTPUT
+      - run: echo '${{ steps.eval.outputs }}'
