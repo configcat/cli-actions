@@ -29894,11 +29894,10 @@ function evalFlag() {
                 core.setFailed('Could not determine the evaluation result.');
                 return;
             }
-            const evalResult = JSON.parse(lastLine);
+            const evalResult = new Map(Object.entries(JSON.parse(lastLine)));
             for (const item of evalResult.entries()) {
-                core.setOutput(item[0], item[1].value);
+                core.setOutput(item[0], item[1]['value']);
             }
-            evalResult.forEach((value, key) => { });
             core.endGroup();
         }
         catch (error) {

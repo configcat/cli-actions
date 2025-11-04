@@ -4,8 +4,7 @@ import {installCLI} from '../install'
 import {lastLineOf} from './utils'
 
 interface EvalResult {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any
+  value: string
 }
 
 export async function evalFlag(): Promise<void> {
@@ -61,12 +60,11 @@ export async function evalFlag(): Promise<void> {
       return
     }
 
-    const evalResult = <Map<string, EvalResult>>JSON.parse(lastLine)
+    const evalResult: Map<string, EvalResult> = new Map(Object.entries(JSON.parse(lastLine)))
     for (const item of evalResult.entries()) {
-      core.setOutput(item[0], item[1].value)
+      core.setOutput(item[0], item[1]['value'])
     }
 
-    evalResult.forEach((value: EvalResult, key: string) => {})
     core.endGroup()
   } catch (error) {
     core.setFailed((error as Error).message)
