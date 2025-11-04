@@ -44044,7 +44044,7 @@ function getLatestVersion() {
         const body = yield resp.readBody();
         const statusCode = resp.message.statusCode || 500;
         if (statusCode >= 400) {
-            throw new Error(`Failed to get latest release: status code ${statusCode}: ${body}`);
+            throw new Error(`Failed to get latest CLI version: status code ${statusCode}: ${body}`);
         }
         core.info(`Version: ${body}`);
         core.endGroup();
