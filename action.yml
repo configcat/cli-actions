@@ -1,4 +1,4 @@
-name: 'Setup ConfigCat CLI'
+name: 'ConfigCat CLI Action'
 description: 'GitHub Action for installing the ConfigCat CLI in workflows.'
 
 author: 'ConfigCat'
@@ -8,4 +8,4 @@ branding:
 
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/install/index.js'

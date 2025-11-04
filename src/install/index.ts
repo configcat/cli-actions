@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
 import {checkPlatform} from './platform'
 import {getLatestVersion} from './version'
-import {installCLI} from './install'
+import {downloadCLI} from './download'
 
-async function run(): Promise<void> {
+export async function installCLI(): Promise<void> {
   try {
     const platform = checkPlatform()
     const version = await getLatestVersion()
-    const path = await installCLI(version, platform)
+    const path = await downloadCLI(version, platform)
     core.addPath(core.toPlatformPath(path))
     core.setOutput('configcat-version', version)
     core.info(`ConfigCat CLI v${version} installed successfully.`)
@@ -15,5 +15,3 @@ async function run(): Promise<void> {
     core.setFailed((error as Error).message)
   }
 }
-
-run()

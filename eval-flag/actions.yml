@@ -1,0 +1,26 @@
+name: 'ConfigCat Flag Evaluator'
+description: 'GitHub Action for evaluating ConfigCat feature flags.'
+author: 'ConfigCat'
+branding:
+  icon: toggle-right
+  color: red
+inputs:
+  sdk-key:
+    description: 'SDK key identifying the config to download, also loaded from CONFIGCAT_SDK_KEY.'
+    required: false
+  flag-keys:
+    description: 'Feature flag keys to evaluate.'
+    required: true
+  base-url:
+    description: 'The CDN base url from where the CLI will download the config JSON. Defaults to ConfigCat CDN servers.'
+    required: false
+  data-governance:
+    description: 'Describes the location of your feature flag and setting data within the ConfigCat CDN.'
+    required: false
+  verbose:
+    description: 'Turns on detailed logging.'
+    required: false
+    default: false
+runs:
+  using: 'node20'
+  main: '../dist/eval-flag/index.js'

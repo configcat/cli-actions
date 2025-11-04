@@ -4,7 +4,7 @@
   "description": "GitHub Action for installing the ConfigCat CLI in workflows.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && ncc build src/main.ts",
+    "build": "tsc && ncc build src/install/main.ts -o dist/install && ncc build src/eval-flag/main.ts -o dist/eval-flag",
     "lint": "eslint **/*.ts",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts"
@@ -28,6 +28,7 @@
   "dependencies": {
     "@actions/cache": "^4.1.0",
     "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
     "@actions/http-client": "^3.0.0",
     "@actions/tool-cache": "^2.0.2"
   },

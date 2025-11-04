@@ -41,7 +41,7 @@ jobs:
             exit 1
           fi
 
-  test:
+  test-install:
     strategy:
       fail-fast: false
       matrix:
@@ -56,3 +56,14 @@ jobs:
         run: exit 1
       - name: Ensure ConfigCat CLI is installed
         run: configcat --version
+
+  test-eval:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./eval-flag
+        id: eval

@@ -5,7 +5,7 @@ import {Platform} from './platform'
 
 const toolName = 'configcat'
 
-export async function installCLI(version: string, platform: Platform): Promise<string> {
+export async function downloadCLI(version: string, platform: Platform): Promise<string> {
   let cliPath = tc.find(toolName, version)
   if (!cliPath) {
     core.startGroup('ConfigCat CLI not found in tool cache, downloading')

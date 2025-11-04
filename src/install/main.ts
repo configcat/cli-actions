@@ -1,0 +1,3 @@
+import {installCLI} from '.'
+
+installCLI()
