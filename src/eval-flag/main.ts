@@ -61,6 +61,7 @@ export async function evalFlag(): Promise<void> {
       return
     }
 
+    core.info(lastLine)
     const evalResult = <Map<string, EvalResult>>JSON.parse(lastLine)
     evalResult.forEach((value: EvalResult, key: string) => {
       core.setOutput(key, value.value)
