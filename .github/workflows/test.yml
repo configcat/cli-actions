@@ -73,3 +73,5 @@ jobs:
           flag-keys: |
             str_test
             flag1
+          user-attributes: id:csp
+      - run: echo $GITHUB_OUTPUT

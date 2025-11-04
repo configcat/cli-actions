@@ -29843,6 +29843,7 @@ exports.evalFlag = evalFlag;
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const install_1 = __nccwpck_require__(5255);
+const utils_1 = __nccwpck_require__(330);
 function evalFlag() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Validating input parameters');
@@ -29856,14 +29857,20 @@ function evalFlag() {
             core.setFailed('At least one flag key must be set.');
             return;
         }
+        const userAttributes = core.getMultilineInput('user-attributes');
         const baseUrl = core.getInput('base-url');
         const dataGovernance = core.getInput('data-governance');
         const verbose = core.getBooleanInput('verbose');
         core.endGroup();
+        core.startGroup('Installing ConfigCat CLI');
         yield (0, install_1.installCLI)();
+        core.endGroup();
         try {
             core.startGroup('Evaluating feature flags with ConfigCat CLI');
             const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map'];
+            if (userAttributes.length) {
+                args.push('-ua', ...userAttributes);
+            }
             if (baseUrl) {
                 args.push('-u', baseUrl);
             }
@@ -29875,14 +29882,22 @@ function evalFlag() {
             }
             const result = yield exec.getExecOutput('configcat', args);
             if (result.exitCode !== 0) {
-                core.setFailed(`Flag evaluation failed with status code ${result.exitCode}: ${result.stderr}`);
+                core.setFailed(`Flag evaluation failed with status code ${result.exitCode}`);
                 return;
             }
             if (!result.stdout) {
-                core.setFailed(`Flag evaluation returned with empty result.`);
+                core.setFailed('Flag evaluation returned with empty result.');
                 return;
             }
-            core.info(result.stdout);
+            const lastLine = (0, utils_1.lastLineOf)(result.stdout);
+            if (!lastLine) {
+                core.setFailed('Could not determine the evaluation result.');
+                return;
+            }
+            const evalResult = JSON.parse(lastLine);
+            evalResult.forEach((value, key) => {
+                core.setOutput(key, value);
+            });
             core.endGroup();
         }
         catch (error) {
@@ -29891,6 +29906,23 @@ function evalFlag() {
     });
 }
 evalFlag();
+
+
+/***/ }),
+
+/***/ 330:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.lastLineOf = lastLineOf;
+function lastLineOf(value) {
+    const lastCR = value.lastIndexOf('\r');
+    const lastLF = value.lastIndexOf('\n');
+    const index = Math.max(lastCR, lastLF);
+    return value.slice(index + 1);
+}
 
 
 /***/ }),

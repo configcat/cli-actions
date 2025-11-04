@@ -1,6 +1,12 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import {installCLI} from '../install'
+import {lastLineOf} from './utils'
+
+interface EvalResult {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any
+}
 
 export async function evalFlag(): Promise<void> {
   core.startGroup('Validating input parameters')
@@ -14,15 +20,22 @@ export async function evalFlag(): Promise<void> {
     core.setFailed('At least one flag key must be set.')
     return
   }
+  const userAttributes = core.getMultilineInput('user-attributes')
   const baseUrl = core.getInput('base-url')
   const dataGovernance = core.getInput('data-governance')
   const verbose = core.getBooleanInput('verbose')
   core.endGroup()
 
+  core.startGroup('Installing ConfigCat CLI')
   await installCLI()
+  core.endGroup()
+
   try {
     core.startGroup('Evaluating feature flags with ConfigCat CLI')
     const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map']
+    if (userAttributes.length) {
+      args.push('-ua', ...userAttributes)
+    }
     if (baseUrl) {
       args.push('-u', baseUrl)
     }
@@ -35,15 +48,23 @@ export async function evalFlag(): Promise<void> {
 
     const result = await exec.getExecOutput('configcat', args)
     if (result.exitCode !== 0) {
-      core.setFailed(`Flag evaluation failed with status code ${result.exitCode}: ${result.stderr}`)
+      core.setFailed(`Flag evaluation failed with status code ${result.exitCode}`)
       return
     }
     if (!result.stdout) {
-      core.setFailed(`Flag evaluation returned with empty result.`)
+      core.setFailed('Flag evaluation returned with empty result.')
+      return
+    }
+    const lastLine = lastLineOf(result.stdout)
+    if (!lastLine) {
+      core.setFailed('Could not determine the evaluation result.')
       return
     }
 
-    core.info(result.stdout)
+    const evalResult = <Map<string, EvalResult>>JSON.parse(lastLine)
+    evalResult.forEach((value: EvalResult, key: string) => {
+      core.setOutput(key, value)
+    })
     core.endGroup()
   } catch (error) {
     core.setFailed((error as Error).message)
