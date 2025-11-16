@@ -29895,9 +29895,12 @@ function evalFlags() {
             const evalResult = JSON.parse(lastLine);
             const evalMap = new Map(Object.entries(evalResult));
             for (const [key, value] of evalMap) {
-                core.setOutput(key, `${value.value}`);
-                console.log(key);
-                console.log(`${value.value}`);
+                if (!value.value) {
+                    core.setOutput(key, '');
+                }
+                else {
+                    core.setOutput(key, `${value.value}`);
+                }
             }
         }
         catch (error) {
