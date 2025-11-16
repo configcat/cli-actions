@@ -29894,8 +29894,10 @@ function evalFlags() {
             }
             const evalResult = JSON.parse(lastLine);
             const evalMap = new Map(Object.entries(evalResult));
-            for (let [key, value] of evalMap) {
+            for (const [key, value] of evalMap) {
                 core.setOutput(key, `${value.value}`);
+                console.log(key);
+                console.log(`${value.value}`);
             }
         }
         catch (error) {

@@ -62,8 +62,10 @@ export async function evalFlags(): Promise<void> {
     const evalResult = JSON.parse(lastLine)
     const evalMap: Map<string, EvalResult> = new Map(Object.entries(evalResult))
 
-    for (let [key, value] of evalMap) {
+    for (const [key, value] of evalMap) {
       core.setOutput(key, `${value.value}`)
+      console.log(key)
+      console.log(`${value.value}`)
     }
   } catch (error) {
     core.setFailed((error as Error).message)
