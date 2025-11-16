@@ -29865,7 +29865,7 @@ function evalFlags() {
         yield (0, install_1.installCLI)();
         try {
             core.info('Evaluating feature flags with ConfigCat CLI');
-            const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map'];
+            const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json'];
             if (userAttributes.length) {
                 args.push('-ua', ...userAttributes);
             }
@@ -29892,10 +29892,10 @@ function evalFlags() {
                 core.setFailed('Could not determine the evaluation result.');
                 return;
             }
-            const flags = lastLine.split(';');
-            for (const flag of flags) {
-                const parts = flag.split('=');
-                core.setOutput(parts[0], parts[1]);
+            const evalResult = JSON.parse(lastLine);
+            const evalMap = new Map(Object.entries(evalResult));
+            for (let [key, value] of evalMap) {
+                core.setOutput(key, `${value.value}`);
             }
         }
         catch (error) {

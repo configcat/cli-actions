@@ -3,6 +3,11 @@ import * as exec from '@actions/exec'
 import {installCLI} from '../install'
 import {lastLineOf} from './utils'
 
+interface EvalResult {
+  // eslint-disable-next-line
+  value: any
+}
+
 export async function evalFlags(): Promise<void> {
   core.startGroup('Validating input parameters')
   const sdkKey = core.getInput('sdk-key') || process.env.CONFIGCAT_SDK_KEY
@@ -25,7 +30,7 @@ export async function evalFlags(): Promise<void> {
 
   try {
     core.info('Evaluating feature flags with ConfigCat CLI')
-    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--map']
+    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json']
     if (userAttributes.length) {
       args.push('-ua', ...userAttributes)
     }
@@ -54,10 +59,11 @@ export async function evalFlags(): Promise<void> {
       return
     }
 
-    const flags = lastLine.split(';')
-    for (const flag of flags) {
-      const parts = flag.split('=')
-      core.setOutput(parts[0], parts[1])
+    const evalResult = JSON.parse(lastLine)
+    const evalMap: Map<string, EvalResult> = new Map(Object.entries(evalResult))
+
+    for (let [key, value] of evalMap) {
+      core.setOutput(key, `${value.value}`)
     }
   } catch (error) {
     core.setFailed((error as Error).message)
