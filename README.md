@@ -23,6 +23,10 @@ jobs:
       # Using the CLI in other steps
       - name: Update feature flag value
         run: configcat flag-v2 value update --flag-id <flag-id> --environment-id <environment-id> --flag-value true
+        env: 
+          CONFIGCAT_API_USER: ${{ secrets.CONFIGCAT_API_USER }}
+          CONFIGCAT_API_PASS: ${{ secrets.CONFIGCAT_API_PASS }}
+          
 ```
 
 ## Evaluate feature flags
