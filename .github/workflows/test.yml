@@ -63,17 +63,20 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
+    outputs:
+      isAwesomeFeatureEnabled: ${{ steps.eval.outputs.isAwesomeFeatureEnabled }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./eval-flag
         id: eval
         with:
+          # This is a public SDK key used by our code examples
           sdk-key: configcat-sdk-1/PKDVCLf-Hq-h-kCzMp-L7Q/tiOvFw5gkky9LFu1Duuvzw
           flag-keys: |
             isAwesomeFeatureEnabled
             isPOCFeatureEnabled
             nonexisting
-          user-attributes: email:csp@example.com
+          user-attributes: email:user@example.com
       - name: Fail if flag 1 value mismatch
         if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
@@ -82,4 +85,12 @@ jobs:
         run: exit 1
       - name: Fail if flag 3 value mismatch
         if: steps.eval.outputs.nonexisting != ''
+        run: exit 1
+
+  test-eval-dep:
+    needs: [test-eval]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if flag 1 value mismatch
+        if: needs.test-eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
