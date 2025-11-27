@@ -1,5 +1,5 @@
-name: 'ConfigCat CLI Action'
-description: 'GitHub Action for installing the ConfigCat CLI in workflows.'
+name: 'ConfigCat CLI Actions'
+description: 'GitHub Actions for using the ConfigCat CLI in workflows.'
 
 author: 'ConfigCat'
 branding:
