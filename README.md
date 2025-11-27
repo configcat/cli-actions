@@ -12,7 +12,7 @@ List of available actions:
 This action installs the ConfigCat CLI for a job in your workflow, so you can use it in subsequent steps.
 
 ```yaml
-name: Evaluate ConfigCat feature flags
+name: Workflow with ConfigCat CLI
 on: push
 jobs:
   example-job:
