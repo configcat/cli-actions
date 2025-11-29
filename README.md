@@ -11,6 +11,8 @@ List of available actions:
 
 This action installs the ConfigCat CLI for a job in your workflow, so you can use it in subsequent steps.
 
+As the CLI mainly communicates with the ConfigCat Public Management API, it needs to access to an [API credential](https://app.configcat.com/my-account/public-api-credentials). Store the credential in your repository's [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) with the following names: `CONFIGCAT_API_USER`, `CONFIGCAT_API_PASS`.
+
 ```yaml
 name: Workflow with ConfigCat CLI
 on: push
@@ -43,10 +45,12 @@ jobs:
         id: flags
         uses: configcat/cli-actions/eval-flag@v1
         with:
-          sdk-key: ${{ secrets.SDK_KEY }}
+          sdk-key: ${{ secrets.CONFIGCAT_SDK_KEY }}
           flag-keys: |
             flag1
             flag2
+          user-attributes: |
+            id:1234
       
       - name: Step depending on flag1
         if: steps.flags.outputs.flag1 == 'true'
