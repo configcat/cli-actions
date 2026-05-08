@@ -78,6 +78,7 @@ jobs:
             nonexisting:false
             nonexistingButTrueDefault:true
           user-attributes: email:user@example.com
+      - run: echo {{ steps.eval.outputs }}
       - name: Fail if flag 1 value mismatch
         if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
