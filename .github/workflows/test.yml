@@ -75,8 +75,11 @@ jobs:
           flag-keys: |
             isAwesomeFeatureEnabled
             isPOCFeatureEnabled
-            nonexisting
+            nonexisting:false
+            nonexistingButTrueDefault:true
+            nonExistingEmpty
           user-attributes: email:user@example.com
+      - run: echo "${{ toJSON(steps.eval.outputs) }}"
       - name: Fail if flag 1 value mismatch
         if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
         run: exit 1
@@ -84,7 +87,13 @@ jobs:
         if: steps.eval.outputs.isPOCFeatureEnabled != 'true'
         run: exit 1
       - name: Fail if flag 3 value mismatch
-        if: steps.eval.outputs.nonexisting != ''
+        if: steps.eval.outputs.nonexisting != 'false'
+        run: exit 1
+      - name: Fail if flag 4 value mismatch
+        if: steps.eval.outputs.nonexistingButTrueDefault != 'true'
+        run: exit 1
+      - name: Fail if flag 5 value mismatch
+        if: steps.eval.outputs.nonExistingEmpty != ''
         run: exit 1
 
   test-eval-dep:
