@@ -77,6 +77,7 @@ jobs:
             isPOCFeatureEnabled
             nonexisting:false
             nonexistingButTrueDefault:true
+            nonExistingEmpty
           user-attributes: email:user@example.com
       - run: echo "${{ toJSON(steps.eval.outputs) }}"
       - name: Fail if flag 1 value mismatch
@@ -90,6 +91,9 @@ jobs:
         run: exit 1
       - name: Fail if flag 4 value mismatch
         if: steps.eval.outputs.nonexistingButTrueDefault != 'true'
+        run: exit 1
+      - name: Fail if flag 5 value mismatch
+        if: steps.eval.outputs.nonExistingEmpty != ''
         run: exit 1
 
   test-eval-dep:
