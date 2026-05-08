@@ -75,7 +75,8 @@ jobs:
           flag-keys: |
             isAwesomeFeatureEnabled
             isPOCFeatureEnabled
-            nonexisting
+            nonexisting:false
+            nonexistingButTrueDefault:true
           user-attributes: email:user@example.com
       - name: Fail if flag 1 value mismatch
         if: steps.eval.outputs.isAwesomeFeatureEnabled != 'true'
@@ -84,7 +85,10 @@ jobs:
         if: steps.eval.outputs.isPOCFeatureEnabled != 'true'
         run: exit 1
       - name: Fail if flag 3 value mismatch
-        if: steps.eval.outputs.nonexisting != ''
+        if: steps.eval.outputs.nonexisting != 'false'
+        run: exit 1
+      - name: Fail if flag 4 value mismatch
+        if: steps.eval.outputs.nonexistingButTrueDefault != 'true'
         run: exit 1
 
   test-eval-dep:

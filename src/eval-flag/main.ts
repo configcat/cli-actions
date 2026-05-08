@@ -6,6 +6,12 @@ import {lastLineOf} from './utils'
 interface EvalResult {
   // eslint-disable-next-line
   value: any
+  isDefaultValue: boolean
+}
+
+interface FlagInput {
+  key: string
+  defaultValue?: string
 }
 
 export async function evalFlags(): Promise<void> {
@@ -15,11 +21,15 @@ export async function evalFlags(): Promise<void> {
     core.setFailed('Either the sdk-key parameter or the CONFIGCAT_SDK_KEY environment variable must be set.')
     return
   }
-  const flagKeys = core.getMultilineInput('flag-keys')
-  if (!flagKeys.length) {
+  const flags = core.getMultilineInput('flag-keys')
+  if (!flags.length) {
     core.setFailed('At least one flag key must be set.')
     return
   }
+  const flagInputs: FlagInput[] = flags.map(input => {
+    const [key, defaultValue] = input.split(':').map(s => s.trim())
+    return {key, defaultValue}
+  })
   const userAttributes = core.getMultilineInput('user-attributes')
   const baseUrl = core.getInput('base-url')
   const dataGovernance = core.getInput('data-governance')
@@ -30,7 +40,7 @@ export async function evalFlags(): Promise<void> {
 
   try {
     core.info('Evaluating feature flags with ConfigCat CLI')
-    const args = ['eval', '-sk', sdkKey, '-fk', ...flagKeys, '--json']
+    const args = ['eval', '-sk', sdkKey, '-fk', ...flagInputs.map(f => f.key), '--json']
     if (userAttributes.length) {
       args.push('-ua', ...userAttributes)
     }
@@ -63,8 +73,9 @@ export async function evalFlags(): Promise<void> {
     const evalMap: Map<string, EvalResult> = new Map(Object.entries(evalResult))
 
     for (const [key, value] of evalMap) {
-      if (!value.value) {
-        core.setOutput(key, '')
+      if (value.isDefaultValue) {
+        const flagInput = flagInputs.find(f => f.key === key)
+        core.setOutput(key, `${flagInput?.defaultValue ?? ''}`)
       } else {
         core.setOutput(key, `${value.value}`)
       }
